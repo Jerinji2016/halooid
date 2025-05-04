@@ -12,23 +12,26 @@ Halooid is a multi-product platform consisting of five integrated products desig
 
 ## Documentation
 
-Comprehensive documentation is available at [https://yourusername.github.io/halooid](https://yourusername.github.io/halooid).
+Comprehensive documentation is available in the [docs](./docs) directory.
 
 ## Technical Stack
 
 ### Backend
+
 - **Language**: Go
 - **API Approach**: Hybrid (REST with OpenAPI + gRPC for internal communication)
 - **Database**: PostgreSQL with Redis for caching
 - **Authentication**: JWT-based with role-based access control
 
 ### Web Frontend
+
 - **Framework**: Svelte with SvelteKit
 - **Styling**: Tailwind CSS
 - **State Management**: Svelte stores
 - **Build System**: Vite
 
 ### Mobile
+
 - **Framework**: Flutter
 - **State Management**: Provider/Riverpod
 - **API Communication**: Dio
@@ -47,25 +50,51 @@ Comprehensive documentation is available at [https://yourusername.github.io/halo
 
 ### Installation
 
-For detailed installation instructions, see the [Installation Guide](https://yourusername.github.io/halooid/getting-started/installation/).
+For detailed installation instructions, see the [Installation Guide](./docs/getting-started/setup.md).
 
-Quick start with Docker Compose:
+Quick start with our setup script:
 
 ```bash
-git clone https://github.com/yourusername/halooid.git
+git clone https://github.com/Jerinji2016/halooid.git
 cd halooid
-cp .env.example .env
-# Edit .env file with your configuration
+./scripts/setup-dev-env.sh
 docker-compose up -d
+```
+
+This will:
+
+1. Check if all required tools are installed
+2. Set up the development environment with Docker Compose
+3. Start PostgreSQL and Redis services
+4. Initialize the database schema
+
+### Project Structure
+
+```text
+/
+├── backend/                # Backend services
+│   ├── cmd/                # Application entry points
+│   ├── internal/           # Private application code
+│   ├── pkg/                # Reusable packages
+│   ├── api/                # API definitions
+│   ├── scripts/            # Build and deployment scripts
+│   └── configs/            # Configuration files
+├── web/                    # Web frontend
+│   ├── packages/           # Shared packages
+│   └── apps/               # SvelteKit applications
+├── mobile/                 # Mobile applications
+│   ├── packages/           # Shared packages
+│   └── apps/               # Flutter applications
+└── docs/                   # Documentation
 ```
 
 ## Development
 
-For development instructions, see the [Development Guide](https://yourusername.github.io/halooid/development/).
+For development instructions, see the [Development Guide](./docs/development/index.md).
 
 ## Contributing
 
-We welcome contributions to the Halooid platform! Please see our [Contributing Guide](https://yourusername.github.io/halooid/contributing/) for more information.
+We welcome contributions to the Halooid platform! Please see our [Contributing Guide](./docs/contributing/index.md) for more information.
 
 ## License
 

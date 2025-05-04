@@ -28,51 +28,49 @@ Before you begin development, ensure you have the following installed:
 
 ### Setting Up Your Development Environment
 
-Follow these steps to set up your development environment:
+We provide a setup script that will check for required tools and help set up your development environment.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/halooid.git
+   git clone https://github.com/Jerinji2016/halooid.git
    cd halooid
    ```
 
-2. Install backend dependencies:
+2. Run the setup script:
+   ```bash
+   ./scripts/setup-dev-env.sh
+   ```
+
+3. Start the development environment:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Install backend dependencies:
    ```bash
    cd backend
    go mod download
    ```
 
-3. Install frontend dependencies:
+5. Install frontend dependencies:
    ```bash
    cd ../web
    npm install
    ```
 
-4. Install mobile dependencies:
+6. Install mobile dependencies:
    ```bash
    cd ../mobile
    flutter pub get
    ```
 
-5. Set up the database:
-   ```bash
-   cd ../scripts
-   ./setup-database.sh
-   ```
-
-6. Start the development environment:
-   ```bash
-   cd ..
-   docker-compose up -d
-   ```
-
-For more detailed instructions, see the [Setup Guide](setup.md).
+For more detailed instructions, see the [Setup Guide](../getting-started/setup.md).
 
 ## Project Structure
 
 The Halooid platform follows a monorepo approach with the following structure:
 
-```
+```text
 /
 ├── backend/                # Backend services
 │   ├── cmd/                # Application entry points
@@ -209,14 +207,14 @@ For more information about testing, see the [Testing Guide](testing.md).
 If you encounter issues that are not covered in this guide, you can:
 
 1. Check the [FAQ](../faq.md) for common questions and answers.
-2. Search for similar issues in the [GitHub Issues](https://github.com/yourusername/halooid/issues).
-3. Ask for help in the [GitHub Discussions](https://github.com/yourusername/halooid/discussions).
+2. Search for similar issues in the [GitHub Issues](https://github.com/Jerinji2016/halooid/issues).
+3. Ask for help in the [GitHub Discussions](https://github.com/Jerinji2016/halooid/discussions).
 
 ## Next Steps
 
 To learn more about specific aspects of development, check out the following guides:
 
-- [Setup Guide](setup.md)
+- [Setup Guide](../getting-started/setup.md)
 - [Workflow Guide](workflow.md)
 - [Coding Standards Guide](coding-standards.md)
 - [Testing Guide](testing.md)

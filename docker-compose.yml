@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:14-alpine
+    container_name: halooid-postgres
+    environment:
+      POSTGRES_USER: halooid
+      POSTGRES_PASSWORD: halooid_password
+      POSTGRES_DB: halooid
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U halooid"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - halooid-network
+
+  # Redis for caching and session management
+  redis:
+    image: redis:6-alpine
+    container_name: halooid-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - halooid-network
+
+  # Adminer for database management (optional)
+  adminer:
+    image: adminer
+    container_name: halooid-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - halooid-network
+
+  # API Gateway (will be built later)
+  # api-gateway:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: ./cmd/api-gateway/Dockerfile
+  #   container_name: halooid-api-gateway
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   environment:
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: halooid
+  #     DB_PASSWORD: halooid_password
+  #     DB_NAME: halooid
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #   networks:
+  #     - halooid-network
+
+  # Web frontend (will be built later)
+  # web:
+  #   build:
+  #     context: ./web
+  #     dockerfile: Dockerfile
+  #   container_name: halooid-web
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - api-gateway
+  #   networks:
+  #     - halooid-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  halooid-network:
+    driver: bridge
