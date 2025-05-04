@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Halooid Documentation
+    url: https://github.com/Jerinji2016/halooid/tree/main/docs
+    about: Check the documentation for more information about the Halooid platform.
+  - name: GitHub Discussions
+    url: https://github.com/Jerinji2016/halooid/discussions
+    about: Please ask and answer questions here.
