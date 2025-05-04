@@ -1,7 +1,7 @@
 site_name: Halooid Platform
 site_description: Documentation for the Halooid multi-product platform
 site_author: Halooid Team
-site_url: https://github.com/yourusername/halooid
+site_url: https://yourusername.github.io/halooid
 
 # Repository
 repo_name: halooid
@@ -41,8 +41,8 @@ theme:
   font:
     text: Roboto
     code: Roboto Mono
-  favicon: assets/favicon.png
-  logo: assets/logo.png
+#  favicon: assets/favicon.png
+#  logo: assets/logo.png
 
 # Extensions
 markdown_extensions:
@@ -93,11 +93,7 @@ plugins:
       minify_html: true
   - git-revision-date-localized:
       type: date
-  - mkdocstrings:
-      handlers:
-        python:
-          options:
-            show_source: true
+
 
 # Navigation
 nav:
