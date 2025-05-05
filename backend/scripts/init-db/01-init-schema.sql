@@ -80,23 +80,62 @@ ON CONFLICT DO NOTHING;
 
 -- Insert default permissions
 INSERT INTO permissions (name, description) VALUES
+    -- User permissions
     ('read:users', 'Can read user information'),
     ('write:users', 'Can create and update user information'),
     ('delete:users', 'Can delete users'),
+
+    -- Organization permissions
     ('read:organizations', 'Can read organization information'),
     ('write:organizations', 'Can create and update organization information'),
-    ('delete:organizations', 'Can delete organizations')
+    ('delete:organizations', 'Can delete organizations'),
+
+    -- Role permissions
+    ('read:roles', 'Can read role information'),
+    ('write:roles', 'Can create and update roles'),
+    ('delete:roles', 'Can delete roles'),
+    ('assign:roles', 'Can assign roles to users'),
+
+    -- Permission permissions
+    ('read:permissions', 'Can read permission information'),
+    ('write:permissions', 'Can create and update permissions'),
+    ('delete:permissions', 'Can delete permissions'),
+    ('assign:permissions', 'Can assign permissions to roles'),
+
+    -- Admin permissions
+    ('admin:access', 'Can access admin features'),
+
+    -- User-specific permissions
+    ('user:read', 'Can read user data'),
+    ('user:write', 'Can write user data'),
+    ('user:delete', 'Can delete user data')
 ON CONFLICT DO NOTHING;
 
 -- Assign permissions to roles
+
+-- Assign all permissions to admin role
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r, permissions p
 WHERE r.name = 'admin'
 ON CONFLICT DO NOTHING;
 
+-- Assign limited permissions to user role
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r, permissions p
-WHERE r.name = 'user' AND p.name IN ('read:users', 'read:organizations')
+WHERE r.name = 'user' AND p.name IN (
+    'read:users',
+    'read:organizations',
+    'user:read'
+)
+ON CONFLICT DO NOTHING;
+
+-- Insert default organization
+INSERT INTO organizations (id, name, description)
+VALUES (
+    '00000000-0000-0000-0000-000000000001',
+    'Default Organization',
+    'Default organization for testing'
+)
 ON CONFLICT DO NOTHING;
