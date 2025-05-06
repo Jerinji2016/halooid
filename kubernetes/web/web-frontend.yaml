@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-frontend
+  namespace: halooid
+  labels:
+    app: web-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web-frontend
+  template:
+    metadata:
+      labels:
+        app: web-frontend
+    spec:
+      containers:
+        - name: web-frontend
+          image: ghcr.io/jerinji2016/halooid/web-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: API_URL
+              value: "https://api.halooid.com"
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-frontend
+  namespace: halooid
+spec:
+  selector:
+    app: web-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-frontend-ingress
+  namespace: halooid
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+    - hosts:
+        - halooid.com
+        - www.halooid.com
+      secretName: halooid-web-tls
+  rules:
+    - host: halooid.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-frontend
+                port:
+                  number: 80
+    - host: www.halooid.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-frontend
+                port:
+                  number: 80

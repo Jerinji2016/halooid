@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rbac-service
+  namespace: halooid
+  labels:
+    app: rbac-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rbac-service
+  template:
+    metadata:
+      labels:
+        app: rbac-service
+    spec:
+      containers:
+        - name: rbac-service
+          image: ghcr.io/jerinji2016/halooid/rbac-service:latest
+          ports:
+            - containerPort: 8002
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: halooid-config
+                  key: db_host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: halooid-config
+                  key: db_port
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: halooid-secrets
+                  key: db_user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: halooid-secrets
+                  key: db_password
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: halooid-config
+                  key: db_name
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: halooid-config
+                  key: redis_host
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: halooid-config
+                  key: redis_port
+            - name: ACCESS_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: halooid-secrets
+                  key: access_token_secret
+            - name: REFRESH_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: halooid-secrets
+                  key: refresh_token_secret
+            - name: PORT
+              value: "8002"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rbac-service
+  namespace: halooid
+spec:
+  selector:
+    app: rbac-service
+  ports:
+    - port: 8002
+      targetPort: 8002
+  type: ClusterIP

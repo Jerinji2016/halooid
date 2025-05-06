@@ -1,0 +1,276 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: halooid
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: halooid-secrets
+                  key: db_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: halooid-secrets
+                  key: db_password
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: halooid-config
+                  key: db_name
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "halooid"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "halooid"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: postgres-init-scripts
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: halooid
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: halooid
+data:
+  01-init-schema.sql: |
+    -- Create extensions
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+    -- Create users table
+    CREATE TABLE IF NOT EXISTS users (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        first_name VARCHAR(100) NOT NULL,
+        last_name VARCHAR(100) NOT NULL,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    );
+
+    -- Create organizations table
+    CREATE TABLE IF NOT EXISTS organizations (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    );
+
+    -- Create user_organizations table
+    CREATE TABLE IF NOT EXISTS user_organizations (
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (user_id, organization_id)
+    );
+
+    -- Create roles table
+    CREATE TABLE IF NOT EXISTS roles (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name VARCHAR(100) NOT NULL UNIQUE,
+        description TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    );
+
+    -- Create permissions table
+    CREATE TABLE IF NOT EXISTS permissions (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name VARCHAR(100) NOT NULL UNIQUE,
+        description TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    );
+
+    -- Create role_permissions table
+    CREATE TABLE IF NOT EXISTS role_permissions (
+        role_id UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+        permission_id UUID NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
+        PRIMARY KEY (role_id, permission_id)
+    );
+
+    -- Create user_roles table
+    CREATE TABLE IF NOT EXISTS user_roles (
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        role_id UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+        organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+        PRIMARY KEY (user_id, role_id, organization_id)
+    );
+
+    -- Insert default roles
+    INSERT INTO roles (name, description) VALUES
+        ('admin', 'Administrator with full access'),
+        ('user', 'Regular user with limited access')
+    ON CONFLICT DO NOTHING;
+
+    -- Insert default permissions
+    INSERT INTO permissions (name, description) VALUES
+        -- User permissions
+        ('read:users', 'Can read user information'),
+        ('write:users', 'Can create and update user information'),
+        ('delete:users', 'Can delete users'),
+        
+        -- Organization permissions
+        ('read:organizations', 'Can read organization information'),
+        ('write:organizations', 'Can create and update organization information'),
+        ('delete:organizations', 'Can delete organizations'),
+        
+        -- Role permissions
+        ('read:roles', 'Can read role information'),
+        ('write:roles', 'Can create and update roles'),
+        ('delete:roles', 'Can delete roles'),
+        ('assign:roles', 'Can assign roles to users'),
+        
+        -- Permission permissions
+        ('read:permissions', 'Can read permission information'),
+        ('write:permissions', 'Can create and update permissions'),
+        ('delete:permissions', 'Can delete permissions'),
+        ('assign:permissions', 'Can assign permissions to roles'),
+        
+        -- Admin permissions
+        ('admin:access', 'Can access admin features'),
+        
+        -- User-specific permissions
+        ('user:read', 'Can read user data'),
+        ('user:write', 'Can write user data'),
+        ('user:delete', 'Can delete user data')
+    ON CONFLICT DO NOTHING;
+
+    -- Assign permissions to roles
+
+    -- Assign all permissions to admin role
+    INSERT INTO role_permissions (role_id, permission_id)
+    SELECT r.id, p.id
+    FROM roles r, permissions p
+    WHERE r.name = 'admin'
+    ON CONFLICT DO NOTHING;
+
+    -- Assign limited permissions to user role
+    INSERT INTO role_permissions (role_id, permission_id)
+    SELECT r.id, p.id
+    FROM roles r, permissions p
+    WHERE r.name = 'user' AND p.name IN (
+        'read:users',
+        'read:organizations',
+        'user:read'
+    )
+    ON CONFLICT DO NOTHING;
+
+    -- Insert default organization
+    INSERT INTO organizations (id, name, description)
+    VALUES (
+        '00000000-0000-0000-0000-000000000001',
+        'Default Organization',
+        'Default organization for testing'
+    )
+    ON CONFLICT DO NOTHING;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: halooid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:6-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: halooid
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+  type: ClusterIP

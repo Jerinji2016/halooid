@@ -1,0 +1,143 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          cache: true
+          cache-dependency-path: backend/go.sum
+      
+      - name: Install dependencies
+        run: go mod download
+      
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.53
+          working-directory: backend
+  
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: halooid
+          POSTGRES_PASSWORD: halooid_password
+          POSTGRES_DB: halooid_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:6-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          cache: true
+          cache-dependency-path: backend/go.sum
+      
+      - name: Install dependencies
+        run: go mod download
+      
+      - name: Run tests
+        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: halooid
+          DB_PASSWORD: halooid_password
+          DB_NAME: halooid_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage.txt
+          flags: backend
+  
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          cache: true
+          cache-dependency-path: backend/go.sum
+      
+      - name: Install dependencies
+        run: go mod download
+      
+      - name: Build API Gateway
+        run: go build -v -o bin/api-gateway ./cmd/api-gateway
+      
+      - name: Build Auth Service
+        run: go build -v -o bin/auth-service ./cmd/auth-service
+      
+      - name: Build RBAC Service
+        run: go build -v -o bin/rbac-service ./cmd/rbac-service
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-binaries
+          path: |
+            backend/bin/api-gateway
+            backend/bin/auth-service
+            backend/bin/rbac-service

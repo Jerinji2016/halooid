@@ -1,0 +1,133 @@
+name: Mobile CD
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-android:
+    name: Build and Release Android
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./mobile
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Setup Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
+      
+      - name: Build APK
+        run: flutter build apk --release
+      
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-release
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+      
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-bundle
+          path: mobile/build/app/outputs/bundle/release/app-release.aab
+      
+      - name: Release to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.halooid.app
+          releaseFiles: mobile/build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+          whatsNewDirectory: mobile/distribution/whatsnew
+  
+  build-ios:
+    name: Build and Release iOS
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ./mobile
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Install Apple Certificate
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.IOS_P12_CERTIFICATE_BASE64 }}
+          p12-password: ${{ secrets.IOS_P12_CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+      
+      - name: Install the provisioning profile
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+      
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
+      
+      - name: Archive iOS app
+        run: |
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath Runner.xcarchive archive
+      
+      - name: Export iOS app
+        run: |
+          cd ios
+          xcodebuild -exportArchive -archivePath Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/ios/ipa
+      
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-release
+          path: mobile/ios/build/ios/ipa
+      
+      - name: Upload to App Store
+        uses: apple-actions/upload-app-store@v1
+        with:
+          app-path: mobile/ios/build/ios/ipa/Runner.ipa
+          apple-id: ${{ secrets.APPLE_ID }}
+          app-specific-password: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          team-id: ${{ secrets.APPLE_TEAM_ID }}
+          skip-binary-upload: false
+          skip-screenshots: true
+          skip-metadata: true
