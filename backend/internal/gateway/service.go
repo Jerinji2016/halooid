@@ -71,7 +71,6 @@ func (s *Service) setupMiddleware() {
 		s.router.Use(httprate.LimitByIP(
 			s.config.RateLimit.Requests,
 			s.config.RateLimit.Period,
-			s.config.RateLimit.BurstSize,
 		))
 	}
 }

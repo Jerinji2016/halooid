@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Jerinji2016/halooid/backend/internal/auth"
 	"github.com/Jerinji2016/halooid/backend/internal/models"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
