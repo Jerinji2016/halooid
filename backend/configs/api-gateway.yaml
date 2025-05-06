@@ -1,0 +1,66 @@
+server:
+  port: 8000
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+
+rate_limit:
+  enabled: true
+  requests: 100
+  period: 1m
+  burst_size: 20
+
+cors:
+  enabled: true
+  allowed_origins:
+    - "*"
+  allowed_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+    - "PATCH"
+  allowed_headers:
+    - "Content-Type"
+    - "Authorization"
+    - "X-Requested-With"
+  exposed_headers:
+    - "Content-Length"
+  allow_credentials: true
+  max_age: 86400
+
+services:
+  auth:
+    url: http://auth-service:8001
+    timeout: 5s
+  rbac:
+    url: http://rbac-service:8002
+    timeout: 5s
+  taskake:
+    url: http://taskake-service:8003
+    timeout: 5s
+  qultrix:
+    url: http://qultrix-service:8004
+    timeout: 5s
+  adminhub:
+    url: http://adminhub-service:8005
+    timeout: 5s
+  customerconnect:
+    url: http://customerconnect-service:8006
+    timeout: 5s
+  invantray:
+    url: http://invantray-service:8007
+    timeout: 5s
+
+logging:
+  level: info
+  format: json
+
+metrics:
+  enabled: true
+  path: /metrics
+
+health_check:
+  enabled: true
+  path: /health
