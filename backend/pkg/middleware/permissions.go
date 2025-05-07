@@ -33,35 +33,44 @@ const (
 	PermissionUserDelete = "user:delete"
 
 	// Product-specific permissions - Taskodex
-	PermissionTaskodexAccess = "taskodex:access"
-	PermissionTaskRead       = "task:read"
-	PermissionTaskWrite      = "task:write"
-	PermissionTaskDelete     = "task:delete"
-	PermissionProjectRead    = "project:read"
-	PermissionProjectWrite   = "project:write"
-	PermissionProjectDelete  = "project:delete"
+	PermissionTaskodexAccess  = "taskodex:access"
+	PermissionTaskRead        = "task:read"
+	PermissionTaskWrite       = "task:write"
+	PermissionTaskDelete      = "task:delete"
+	PermissionProjectRead     = "project:read"
+	PermissionProjectWrite    = "project:write"
+	PermissionProjectDelete   = "project:delete"
+	PermissionTimeEntryRead   = "time_entry:read"
+	PermissionTimeEntryWrite  = "time_entry:write"
+	PermissionTimeEntryDelete = "time_entry:delete"
+	PermissionCommentRead     = "comment:read"
+	PermissionCommentWrite    = "comment:write"
+	PermissionCommentDelete   = "comment:delete"
+	PermissionFileRead        = "file:read"
+	PermissionFileWrite       = "file:write"
+	PermissionFileDelete      = "file:delete"
 
 	// Product-specific permissions - Qultrix
-	PermissionQultrixAccess      = "qultrix:access"
-	PermissionEmployeeRead       = "employee:read"
-	PermissionEmployeeWrite      = "employee:write"
-	PermissionEmployeeDelete     = "employee:delete"
-	PermissionTimeOffRead        = "timeoff:read"
-	PermissionTimeOffWrite       = "timeoff:write"
-	PermissionTimeOffDelete      = "timeoff:delete"
-	PermissionPerformanceRead    = "performance:read"
-	PermissionPerformanceWrite   = "performance:write"
-	PermissionPerformanceDelete  = "performance:delete"
-	PermissionRecruitmentRead    = "recruitment:read"
-	PermissionRecruitmentWrite   = "recruitment:write"
-	PermissionRecruitmentDelete  = "recruitment:delete"
+	PermissionQultrixAccess     = "qultrix:access"
+	PermissionEmployeeRead      = "employee:read"
+	PermissionEmployeeWrite     = "employee:write"
+	PermissionEmployeeDelete    = "employee:delete"
+	PermissionTimeOffRead       = "timeoff:read"
+	PermissionTimeOffWrite      = "timeoff:write"
+	PermissionTimeOffDelete     = "timeoff:delete"
+	PermissionPerformanceRead   = "performance:read"
+	PermissionPerformanceWrite  = "performance:write"
+	PermissionPerformanceDelete = "performance:delete"
+	PermissionRecruitmentRead   = "recruitment:read"
+	PermissionRecruitmentWrite  = "recruitment:write"
+	PermissionRecruitmentDelete = "recruitment:delete"
 
 	// Product-specific permissions - AdminHub
-	PermissionAdminHubAccess     = "adminhub:access"
-	PermissionMonitoringRead     = "monitoring:read"
-	PermissionMonitoringWrite    = "monitoring:write"
-	PermissionSecurityRead       = "security:read"
-	PermissionSecurityWrite      = "security:write"
+	PermissionAdminHubAccess  = "adminhub:access"
+	PermissionMonitoringRead  = "monitoring:read"
+	PermissionMonitoringWrite = "monitoring:write"
+	PermissionSecurityRead    = "security:read"
+	PermissionSecurityWrite   = "security:write"
 
 	// Product-specific permissions - CustomerConnect
 	PermissionCustomerConnectAccess = "customerconnect:access"
@@ -79,19 +88,19 @@ const (
 	PermissionCaseDelete            = "case:delete"
 
 	// Product-specific permissions - Invantray
-	PermissionInvantrayAccess    = "invantray:access"
-	PermissionInventoryRead      = "inventory:read"
-	PermissionInventoryWrite     = "inventory:write"
-	PermissionInventoryDelete    = "inventory:delete"
-	PermissionWarehouseRead      = "warehouse:read"
-	PermissionWarehouseWrite     = "warehouse:write"
-	PermissionWarehouseDelete    = "warehouse:delete"
-	PermissionAssetRead          = "asset:read"
-	PermissionAssetWrite         = "asset:write"
-	PermissionAssetDelete        = "asset:delete"
-	PermissionProcurementRead    = "procurement:read"
-	PermissionProcurementWrite   = "procurement:write"
-	PermissionProcurementDelete  = "procurement:delete"
+	PermissionInvantrayAccess   = "invantray:access"
+	PermissionInventoryRead     = "inventory:read"
+	PermissionInventoryWrite    = "inventory:write"
+	PermissionInventoryDelete   = "inventory:delete"
+	PermissionWarehouseRead     = "warehouse:read"
+	PermissionWarehouseWrite    = "warehouse:write"
+	PermissionWarehouseDelete   = "warehouse:delete"
+	PermissionAssetRead         = "asset:read"
+	PermissionAssetWrite        = "asset:write"
+	PermissionAssetDelete       = "asset:delete"
+	PermissionProcurementRead   = "procurement:read"
+	PermissionProcurementWrite  = "procurement:write"
+	PermissionProcurementDelete = "procurement:delete"
 )
 
 // RoleAdmin is the name of the admin role
@@ -112,6 +121,15 @@ func GetProductPermissions(product string) []string {
 			PermissionProjectRead,
 			PermissionProjectWrite,
 			PermissionProjectDelete,
+			PermissionTimeEntryRead,
+			PermissionTimeEntryWrite,
+			PermissionTimeEntryDelete,
+			PermissionCommentRead,
+			PermissionCommentWrite,
+			PermissionCommentDelete,
+			PermissionFileRead,
+			PermissionFileWrite,
+			PermissionFileDelete,
 		}
 	case "qultrix":
 		return []string{
