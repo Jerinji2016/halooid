@@ -12,7 +12,7 @@ class PriorityBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: _getPriorityColor().withOpacity(0.2),
+        color: _getPriorityColor().withAlpha(51), // 0.2 * 255 = 51
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _getPriorityColor()),
       ),

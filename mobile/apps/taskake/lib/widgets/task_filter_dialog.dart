@@ -55,9 +55,9 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
                 _buildStatusChip(TaskStatus.blocked, 'Blocked'),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Priority filter
             Text(
               'Priority',
@@ -98,10 +98,10 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
 
   Widget _buildStatusChip(TaskStatus? status, String label) {
     final isSelected = _selectedStatus == status;
-    
+
     Color getChipColor() {
       if (status == null) return Colors.grey;
-      
+
       switch (status) {
         case TaskStatus.todo:
           return AppTheme.todoStatusColor;
@@ -113,7 +113,7 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
           return AppTheme.blockedStatusColor;
       }
     }
-    
+
     return FilterChip(
       label: Text(label),
       selected: isSelected,
@@ -122,17 +122,17 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
           _selectedStatus = selected ? status : null;
         });
       },
-      backgroundColor: getChipColor().withOpacity(0.2),
-      selectedColor: getChipColor().withOpacity(0.6),
+      backgroundColor: getChipColor().withAlpha(51), // 0.2 * 255 = 51
+      selectedColor: getChipColor().withAlpha(153), // 0.6 * 255 = 153
     );
   }
 
   Widget _buildPriorityChip(TaskPriority? priority, String label) {
     final isSelected = _selectedPriority == priority;
-    
+
     Color getChipColor() {
       if (priority == null) return Colors.grey;
-      
+
       switch (priority) {
         case TaskPriority.low:
           return AppTheme.lowPriorityColor;
@@ -144,7 +144,7 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
           return AppTheme.urgentPriorityColor;
       }
     }
-    
+
     return FilterChip(
       label: Text(label),
       selected: isSelected,
@@ -153,8 +153,8 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
           _selectedPriority = selected ? priority : null;
         });
       },
-      backgroundColor: getChipColor().withOpacity(0.2),
-      selectedColor: getChipColor().withOpacity(0.6),
+      backgroundColor: getChipColor().withAlpha(51), // 0.2 * 255 = 51
+      selectedColor: getChipColor().withAlpha(153), // 0.6 * 255 = 153
     );
   }
 }

@@ -18,6 +18,10 @@ dependencies:
   json_annotation: ^4.8.1
   intl: ^0.18.1
 
+  # Shared packages
+  halooid_widgets:
+    path: ../../packages/widgets
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -27,6 +31,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/
-    - assets/icons/

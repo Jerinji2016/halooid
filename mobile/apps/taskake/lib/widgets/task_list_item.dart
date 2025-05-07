@@ -33,17 +33,17 @@ class TaskListItem extends StatelessWidget {
                     child: Text(
                       task.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        decoration: task.status == TaskStatus.completed
-                            ? TextDecoration.lineThrough
-                            : null,
-                      ),
+                            decoration: task.status == TaskStatus.completed
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   _buildPriorityIndicator(),
                 ],
               ),
-              
+
               // Description (if available)
               if (task.description != null && task.description!.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -54,29 +54,30 @@ class TaskListItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-              
+
               const SizedBox(height: 12),
-              
+
               // Bottom row with metadata
               Row(
                 children: [
                   // Status indicator
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _getStatusColor().withOpacity(0.2),
+                      color: _getStatusColor().withAlpha(51), // 0.2 * 255 = 51
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       _getStatusText(),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _getStatusColor(),
-                      ),
+                            color: _getStatusColor(),
+                          ),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 8),
-                  
+
                   // Due date (if available)
                   if (task.dueDate != null) ...[
                     Icon(
@@ -88,12 +89,12 @@ class TaskListItem extends StatelessWidget {
                     Text(
                       app_date_utils.DateUtils.formatDate(task.dueDate!),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _getDueDateColor(),
-                      ),
+                            color: _getDueDateColor(),
+                          ),
                     ),
                     const SizedBox(width: 8),
                   ],
-                  
+
                   // Assignee (if available)
                   if (task.assigneeName != null) ...[
                     const Icon(
@@ -121,7 +122,7 @@ class TaskListItem extends StatelessWidget {
 
   Widget _buildPriorityIndicator() {
     Color color;
-    
+
     switch (task.priority) {
       case TaskPriority.low:
         color = AppTheme.lowPriorityColor;
@@ -136,7 +137,7 @@ class TaskListItem extends StatelessWidget {
         color = AppTheme.urgentPriorityColor;
         break;
     }
-    
+
     return Container(
       width: 16,
       height: 16,
@@ -175,10 +176,10 @@ class TaskListItem extends StatelessWidget {
 
   Color _getDueDateColor() {
     if (task.dueDate == null) return Colors.grey;
-    
+
     final now = DateTime.now();
     final difference = task.dueDate!.difference(now).inDays;
-    
+
     if (difference < 0) {
       return Colors.red;
     } else if (difference == 0) {

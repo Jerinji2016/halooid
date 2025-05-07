@@ -22,7 +22,8 @@ class DateTimePicker extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                border: Border.all(
+                    color: Colors.grey.withAlpha(128)), // 0.5 * 255 = 128
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -65,7 +66,7 @@ class DateTimePicker extends StatelessWidget {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime now = DateTime.now();
     final DateTime initialDate = selectedDate ?? now;
-    
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -85,7 +86,7 @@ class DateTimePicker extends StatelessWidget {
         );
       },
     );
-    
+
     if (picked != null) {
       // Now select time
       final TimeOfDay? pickedTime = await showTimePicker(
@@ -105,7 +106,7 @@ class DateTimePicker extends StatelessWidget {
           );
         },
       );
-      
+
       if (pickedTime != null) {
         final DateTime combinedDateTime = DateTime(
           picked.year,
@@ -114,7 +115,7 @@ class DateTimePicker extends StatelessWidget {
           pickedTime.hour,
           pickedTime.minute,
         );
-        
+
         onDateSelected(combinedDateTime);
       }
     }

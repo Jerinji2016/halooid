@@ -1,53 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:taskake/services/task_service.dart';
-import 'package:taskake/screens/task_list_screen.dart';
-import 'package:taskake/screens/task_detail_screen.dart';
-import 'package:taskake/screens/task_create_screen.dart';
-import 'package:taskake/screens/task_edit_screen.dart';
-import 'package:taskake/models/task.dart';
-import 'package:taskake/theme/app_theme.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TaskService()),
-      ],
-      child: const TaskakeApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
-class TaskakeApp extends StatelessWidget {
-  const TaskakeApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Taskake',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const TaskListScreen(),
-        '/task/create': (context) => const TaskCreateScreen(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/task/detail') {
-          final Task task = settings.arguments as Task;
-          return MaterialPageRoute(
-            builder: (context) => TaskDetailScreen(task: task),
-          );
-        } else if (settings.name == '/task/edit') {
-          final Task task = settings.arguments as Task;
-          return MaterialPageRoute(
-            builder: (context) => TaskEditScreen(task: task),
-          );
-        }
-        return null;
-      },
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Taskake Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

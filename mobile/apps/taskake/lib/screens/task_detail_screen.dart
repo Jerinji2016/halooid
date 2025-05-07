@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:taskake/models/task.dart';
 import 'package:taskake/services/task_service.dart';
 import 'package:taskake/theme/app_theme.dart';
-import 'package:taskake/utils/date_utils.dart';
+import 'package:taskake/utils/date_utils.dart' as app_date_utils;
 import 'package:taskake/widgets/status_badge.dart';
 import 'package:taskake/widgets/priority_badge.dart';
 import 'package:taskake/widgets/task_timer.dart';
@@ -51,7 +51,7 @@ class TaskDetailScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 16),
-            
+
             // Status and Priority
             Row(
               children: [
@@ -61,19 +61,19 @@ class TaskDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Due Date
             if (task.dueDate != null) ...[
               _buildInfoRow(
                 context,
                 'Due Date',
-                DateUtils.formatDate(task.dueDate!),
+                app_date_utils.DateUtils.formatDate(task.dueDate!),
                 Icons.calendar_today,
                 _getDueDateColor(task.dueDate!),
               ),
               const SizedBox(height: 12),
             ],
-            
+
             // Assignee
             if (task.assigneeName != null) ...[
               _buildInfoRow(
@@ -85,7 +85,7 @@ class TaskDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
             ],
-            
+
             // Project
             if (task.projectName != null) ...[
               _buildInfoRow(
@@ -97,13 +97,14 @@ class TaskDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
             ],
-            
+
             // Time Tracking
-            if (task.estimatedMinutes != null || task.actualMinutes != null) ...[
+            if (task.estimatedMinutes != null ||
+                task.actualMinutes != null) ...[
               _buildTimeTracking(context),
               const SizedBox(height: 12),
             ],
-            
+
             // Tags
             if (task.tags != null && task.tags!.isNotEmpty) ...[
               Text(
@@ -114,14 +115,17 @@ class TaskDetailScreen extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: task.tags!.map((tag) => Chip(
-                  label: Text(tag),
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                )).toList(),
+                children: task.tags!
+                    .map((tag) => Chip(
+                          label: Text(tag),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.surface,
+                        ))
+                    .toList(),
               ),
               const SizedBox(height: 16),
             ],
-            
+
             // Description
             Text(
               'Description',
@@ -141,13 +145,13 @@ class TaskDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Time Tracking Widget
             if (task.status == TaskStatus.inProgress) ...[
               TaskTimer(taskId: task.id),
               const SizedBox(height: 24),
             ],
-            
+
             // Comments Section
             Text(
               'Comments',
@@ -155,16 +159,16 @@ class TaskDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             CommentList(taskId: task.id),
-            
+
             // Created/Updated Info
             const SizedBox(height: 24),
             Text(
-              'Created: ${DateUtils.formatDateTime(task.createdAt)}',
+              'Created: ${app_date_utils.DateUtils.formatDateTime(task.createdAt)}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             if (task.updatedAt != null)
               Text(
-                'Last updated: ${DateUtils.formatDateTime(task.updatedAt!)}',
+                'Last updated: ${app_date_utils.DateUtils.formatDateTime(task.updatedAt!)}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
           ],
@@ -187,7 +191,8 @@ class TaskDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, String label, String value, IconData icon, Color? color) {
+  Widget _buildInfoRow(BuildContext context, String label, String value,
+      IconData icon, Color? color) {
     return Row(
       children: [
         Icon(
@@ -203,8 +208,8 @@ class TaskDetailScreen extends StatelessWidget {
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: color,
-          ),
+                color: color,
+              ),
         ),
       ],
     );
@@ -213,8 +218,10 @@ class TaskDetailScreen extends StatelessWidget {
   Widget _buildTimeTracking(BuildContext context) {
     final estimatedMinutes = task.estimatedMinutes ?? 0;
     final actualMinutes = task.actualMinutes ?? 0;
-    final progress = estimatedMinutes > 0 ? (actualMinutes / estimatedMinutes).clamp(0.0, 1.0) : 0.0;
-    
+    final progress = estimatedMinutes > 0
+        ? (actualMinutes / estimatedMinutes).clamp(0.0, 1.0)
+        : 0.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -246,7 +253,7 @@ class TaskDetailScreen extends StatelessWidget {
 
   Widget _buildStatusButton(BuildContext context, TaskStatus status) {
     final isCurrentStatus = task.status == status;
-    
+
     Color getStatusColor() {
       switch (status) {
         case TaskStatus.todo:
@@ -274,7 +281,8 @@ class TaskDetailScreen extends StatelessWidget {
     }
 
     return ElevatedButton(
-      onPressed: isCurrentStatus ? null : () => _updateTaskStatus(context, status),
+      onPressed:
+          isCurrentStatus ? null : () => _updateTaskStatus(context, status),
       style: ElevatedButton.styleFrom(
         backgroundColor: isCurrentStatus ? getStatusColor() : null,
         foregroundColor: isCurrentStatus ? Colors.white : null,
@@ -290,11 +298,13 @@ class TaskDetailScreen extends StatelessWidget {
       status: newStatus,
       updatedAt: DateTime.now(),
     );
-    
+
     taskService.updateTask(updatedTask).then((result) {
       if (result != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Task status updated to ${newStatus.toString().split('.').last}')),
+          SnackBar(
+              content: Text(
+                  'Task status updated to ${newStatus.toString().split('.').last}')),
         );
         Navigator.pop(context);
       }
@@ -306,7 +316,8 @@ class TaskDetailScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Task'),
-        content: const Text('Are you sure you want to delete this task? This action cannot be undone.'),
+        content: const Text(
+            'Are you sure you want to delete this task? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -326,7 +337,7 @@ class TaskDetailScreen extends StatelessWidget {
 
   void _deleteTask(BuildContext context) {
     final taskService = Provider.of<TaskService>(context, listen: false);
-    
+
     taskService.deleteTask(task.id).then((success) {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -340,7 +351,7 @@ class TaskDetailScreen extends StatelessWidget {
   Color _getDueDateColor(DateTime dueDate) {
     final now = DateTime.now();
     final difference = dueDate.difference(now).inDays;
-    
+
     if (difference < 0) {
       return Colors.red;
     } else if (difference == 0) {

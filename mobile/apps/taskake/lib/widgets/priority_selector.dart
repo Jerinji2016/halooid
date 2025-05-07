@@ -54,7 +54,7 @@ class PrioritySelector extends StatelessWidget {
     Color color,
   ) {
     final isSelected = initialPriority == priority;
-    
+
     return Expanded(
       child: InkWell(
         onTap: () => onChanged(priority),
@@ -62,9 +62,13 @@ class PrioritySelector extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? color.withOpacity(0.2) : Colors.transparent,
+            color: isSelected
+                ? color.withAlpha(51)
+                : Colors.transparent, // 0.2 * 255 = 51
             border: Border.all(
-              color: isSelected ? color : Colors.grey.withOpacity(0.5),
+              color: isSelected
+                  ? color
+                  : Colors.grey.withAlpha(128), // 0.5 * 255 = 128
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(8),
