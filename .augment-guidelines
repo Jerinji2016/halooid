@@ -1,0 +1,68 @@
+# Augment Agent Guidelines for Halooid Platform
+
+## Project Overview
+Halooid is a multi-product platform consisting of five integrated products:
+- Taskake: Task management system
+- Qultrix: Human Resource Management Software
+- AdminHub: Internal monitoring and administration
+- CustomerConnect: CRM for customer interactions
+- Invantray: Inventory and asset management software
+
+## Technology Stack
+- Backend: Go (1.20+)
+- Web Frontend: Svelte with SvelteKit, React components
+- Mobile: Flutter (3.0+)
+- Database: PostgreSQL with Redis for caching
+- API: REST with OpenAPI + gRPC for internal communication
+
+## Code Style Guidelines
+### Go
+- Follow Go Code Review Comments and Effective Go guidelines
+- Use gofmt for code formatting
+
+### Web (React/Svelte)
+- Use TypeScript for type safety
+- Follow functional component patterns
+- Use styled-components for React, built-in styling for Svelte
+- Document components with JSDoc comments
+
+### Flutter/Dart
+- Follow Flutter Style Guide
+- Use Flutter formatter
+
+## Naming Conventions
+- Go: Standard Go conventions (CamelCase for exported, camelCase for internal)
+- React Components: PascalCase (Button, Modal)
+- Files: Match component name (Button.tsx)
+- Props interfaces: ComponentNameProps (ButtonProps)
+- Styled components: StyledComponentName (StyledButton)
+
+## Documentation Requirements
+- Document all public APIs
+- Keep documentation up-to-date with code changes
+- Include JSDoc comments for components and functions
+- Update product-specific documentation when features change
+
+## Testing Guidelines
+- Backend: Write unit tests for business logic, integration tests for APIs
+- Frontend: Write unit tests for components and stores
+- Mobile: Write unit tests for widgets and services
+- Ensure tests pass before submitting PRs
+
+## Git Workflow
+- Create feature branches from main
+- Use descriptive commit messages
+- Reference issue numbers in commits and PRs
+- Submit PRs for code review before merging
+
+## Architecture Principles
+- Follow microservices architecture
+- Maintain clear separation between products
+- Share common infrastructure and libraries
+- Ensure products can integrate with each other
+
+## Product Integration Points
+- Taskake + Qultrix: Task assignment based on employee skills
+- Taskake + CustomerConnect: Customer requests create tasks
+- Invantray + CustomerConnect: Product availability during customer interactions
+- AdminHub: Centralized monitoring of all products
