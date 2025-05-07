@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  timeout: 30
+  read_timeout: 15
+  write_timeout: 15
+  idle_timeout: 60
+
+database:
+  url: "postgres://postgres:postgres@localhost:5432/halooid_test?sslmode=disable"
+  max_open_conns: 25
+  max_idle_conns: 25
+  conn_max_lifetime: 300
+
+auth:
+  jwt_secret: "test_jwt_secret_key"
+  token_expiry: 86400
+  refresh_token_expiry: 604800
+
+storage:
+  base_path: "/tmp/halooid_test_storage"
+  
+api:
+  base_url: "http://localhost:8080"
