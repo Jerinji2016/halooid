@@ -1,13 +1,16 @@
 name: Backend CD
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-cd.yml'
-    tags:
-      - 'v*'
+  # push:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'backend/**'
+  #     - '.github/workflows/backend-cd.yml'
+  #   tags:
+  #     - 'v*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build-and-push:

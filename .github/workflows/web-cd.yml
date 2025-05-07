@@ -1,13 +1,16 @@
 name: Web CD
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'web/**'
-      - '.github/workflows/web-cd.yml'
-    tags:
-      - 'v*'
+  # push:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'web/**'
+  #     - '.github/workflows/web-cd.yml'
+  #   tags:
+  #     - 'v*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build-and-push:
