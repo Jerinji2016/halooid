@@ -13,27 +13,30 @@ import (
 
 // Common errors
 var (
-	ErrUserNotFound      = errors.New("user not found")
+	ErrUserNotFound       = errors.New("user not found")
 	ErrEmailAlreadyExists = errors.New("email already exists")
-	ErrDatabaseError     = errors.New("database error")
+	ErrDatabaseError      = errors.New("database error")
 )
 
 // UserRepository defines the interface for user data access
 type UserRepository interface {
 	// Create creates a new user
 	Create(ctx context.Context, user *models.User) error
-	
+
 	// GetByID retrieves a user by ID
 	GetByID(ctx context.Context, id uuid.UUID) (*models.User, error)
-	
+
 	// GetByEmail retrieves a user by email
 	GetByEmail(ctx context.Context, email string) (*models.User, error)
-	
+
 	// Update updates a user
 	Update(ctx context.Context, user *models.User) error
-	
+
 	// Delete marks a user as inactive
 	Delete(ctx context.Context, id uuid.UUID) error
+
+	// GetDB returns the database connection
+	GetDB() *sqlx.DB
 }
 
 // PostgresUserRepository implements UserRepository using PostgreSQL
@@ -165,4 +168,9 @@ func (r *PostgresUserRepository) Delete(ctx context.Context, id uuid.UUID) error
 	}
 
 	return nil
+}
+
+// GetDB returns the database connection
+func (r *PostgresUserRepository) GetDB() *sqlx.DB {
+	return r.db
 }

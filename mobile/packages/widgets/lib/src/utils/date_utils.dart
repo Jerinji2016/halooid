@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 /// Utility functions for date and time operations
 class DateTimeUtils {
   /// Formats a date as a string using the specified format
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// String formattedDate = DateTimeUtils.formatDate(
@@ -16,7 +16,7 @@ class DateTimeUtils {
   }
 
   /// Formats a time as a string using the specified format
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// String formattedTime = DateTimeUtils.formatTime(
@@ -29,7 +29,7 @@ class DateTimeUtils {
   }
 
   /// Formats a date and time as a string using the specified format
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// String formattedDateTime = DateTimeUtils.formatDateTime(
@@ -37,12 +37,13 @@ class DateTimeUtils {
   ///   format: 'MMM d, yyyy h:mm a',
   /// );
   /// ```
-  static String formatDateTime(DateTime dateTime, {String format = 'yyyy-MM-dd HH:mm'}) {
+  static String formatDateTime(DateTime dateTime,
+      {String format = 'yyyy-MM-dd HH:mm'}) {
     return DateFormat(format).format(dateTime);
   }
 
   /// Returns a relative time string (e.g., "2 hours ago")
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// String relativeTime = DateTimeUtils.getRelativeTime(
@@ -74,7 +75,7 @@ class DateTimeUtils {
   }
 
   /// Returns the start of the day for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime startOfDay = DateTimeUtils.startOfDay(DateTime.now());
@@ -84,7 +85,7 @@ class DateTimeUtils {
   }
 
   /// Returns the end of the day for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime endOfDay = DateTimeUtils.endOfDay(DateTime.now());
@@ -94,7 +95,7 @@ class DateTimeUtils {
   }
 
   /// Returns the start of the week for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime startOfWeek = DateTimeUtils.startOfWeek(
@@ -102,13 +103,14 @@ class DateTimeUtils {
   ///   startOfWeek: DateTime.monday,
   /// );
   /// ```
-  static DateTime startOfWeek(DateTime date, {int startOfWeek = DateTime.monday}) {
+  static DateTime startOfWeek(DateTime date,
+      {int startOfWeek = DateTime.monday}) {
     final day = date.weekday;
     return startOfDay(date.subtract(Duration(days: (day - startOfWeek) % 7)));
   }
 
   /// Returns the end of the week for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime endOfWeek = DateTimeUtils.endOfWeek(
@@ -116,13 +118,14 @@ class DateTimeUtils {
   ///   startOfWeek: DateTime.monday,
   /// );
   /// ```
-  static DateTime endOfWeek(DateTime date, {int startOfWeek = DateTime.monday}) {
-    final startDay = startOfWeek(date, startOfWeek: startOfWeek);
+  static DateTime endOfWeek(DateTime date,
+      {int startOfWeek = DateTime.monday}) {
+    final startDay = DateTimeUtils.startOfWeek(date, startOfWeek: startOfWeek);
     return endOfDay(startDay.add(const Duration(days: 6)));
   }
 
   /// Returns the start of the month for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime startOfMonth = DateTimeUtils.startOfMonth(DateTime.now());
@@ -132,7 +135,7 @@ class DateTimeUtils {
   }
 
   /// Returns the end of the month for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime endOfMonth = DateTimeUtils.endOfMonth(DateTime.now());
@@ -142,7 +145,7 @@ class DateTimeUtils {
   }
 
   /// Returns the start of the year for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime startOfYear = DateTimeUtils.startOfYear(DateTime.now());
@@ -152,7 +155,7 @@ class DateTimeUtils {
   }
 
   /// Returns the end of the year for the given date
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DateTime endOfYear = DateTimeUtils.endOfYear(DateTime.now());
@@ -162,7 +165,7 @@ class DateTimeUtils {
   }
 
   /// Checks if two dates are on the same day
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// bool isSameDay = DateTimeUtils.isSameDay(
@@ -171,11 +174,13 @@ class DateTimeUtils {
   /// );
   /// ```
   static bool isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   /// Checks if a date is today
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// bool isToday = DateTimeUtils.isToday(DateTime.now());
@@ -185,7 +190,7 @@ class DateTimeUtils {
   }
 
   /// Checks if a date is yesterday
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// bool isYesterday = DateTimeUtils.isYesterday(
@@ -197,7 +202,7 @@ class DateTimeUtils {
   }
 
   /// Checks if a date is tomorrow
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// bool isTomorrow = DateTimeUtils.isTomorrow(

@@ -47,8 +47,9 @@ func (m *AuthMiddleware) Authenticate(next http.Handler) http.Handler {
 		}
 
 		// Add user information to context
-		ctx := context.WithValue(r.Context(), auth.UserIDKey, claims.UserID)
-		ctx = context.WithValue(ctx, auth.EmailKey, claims.Email)
+		ctx := auth.SetUserIDInContext(r.Context(), claims.UserID)
+		ctx = auth.SetTokenInContext(ctx, tokenString)
+		ctx = auth.SetTokenClaimsInContext(ctx, claims)
 
 		// Call the next handler with the updated context
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -62,7 +63,11 @@ func GetUserID(ctx context.Context) (uuid.UUID, error) {
 
 // GetEmail extracts the email from the context
 func GetEmail(ctx context.Context) (string, error) {
-	return auth.GetEmailFromContext(ctx)
+	claims, err := auth.GetTokenClaimsFromContext(ctx)
+	if err != nil {
+		return "", err
+	}
+	return claims.Email, nil
 }
 
 // extractTokenFromHeader extracts the token from the Authorization header

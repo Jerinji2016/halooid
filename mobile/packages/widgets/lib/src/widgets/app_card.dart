@@ -22,44 +22,44 @@ class AppCard extends StatelessWidget {
 
   /// Card content
   final Widget child;
-  
+
   /// Card elevation
   final double? elevation;
-  
+
   /// Card color
   final Color? color;
-  
+
   /// Shadow color
   final Color? shadowColor;
-  
+
   /// Border radius
   final double borderRadius;
-  
+
   /// Border color
   final Color? borderColor;
-  
+
   /// Card margin
   final EdgeInsetsGeometry? margin;
-  
+
   /// Card padding
   final EdgeInsetsGeometry? padding;
-  
+
   /// Clip behavior
   final Clip clipBehavior;
-  
+
   /// Callback when card is tapped
   final VoidCallback? onTap;
-  
+
   /// Callback when card is long pressed
   final VoidCallback? onLongPress;
-  
+
   /// Whether the card is hoverable
   final bool hoverable;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // Create card shape
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(borderRadius),
@@ -67,10 +67,10 @@ class AppCard extends StatelessWidget {
           ? BorderSide(color: borderColor!)
           : BorderSide.none,
     );
-    
+
     // Create card content
     Widget cardContent = child;
-    
+
     // Add padding if specified
     if (padding != null) {
       cardContent = Padding(
@@ -78,7 +78,7 @@ class AppCard extends StatelessWidget {
         child: cardContent,
       );
     }
-    
+
     // Create card
     Widget card = Card(
       elevation: elevation,
@@ -89,7 +89,7 @@ class AppCard extends StatelessWidget {
       clipBehavior: clipBehavior,
       child: cardContent,
     );
-    
+
     // Add tap behavior if specified
     if (onTap != null || onLongPress != null) {
       card = InkWell(
@@ -99,18 +99,19 @@ class AppCard extends StatelessWidget {
         child: card,
       );
     }
-    
+
     // Add hover effect if specified
     if (hoverable) {
       card = MouseRegion(
-        cursor: onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        cursor:
+            onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius),
             boxShadow: [
               BoxShadow(
-                color: AppColors.neutralDark.withOpacity(0.1),
+                color: AppColors.neutralDark.withAlpha(26), // 10% opacity
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -120,7 +121,7 @@ class AppCard extends StatelessWidget {
         ),
       );
     }
-    
+
     return card;
   }
 }
@@ -141,29 +142,29 @@ class AppCardHeader extends StatelessWidget {
 
   /// Header title
   final Widget? title;
-  
+
   /// Header subtitle
   final Widget? subtitle;
-  
+
   /// Leading widget
   final Widget? leading;
-  
+
   /// Trailing widget
   final Widget? trailing;
-  
+
   /// Header padding
   final EdgeInsetsGeometry? padding;
-  
+
   /// Whether to show a border at the bottom
   final bool borderBottom;
-  
+
   /// Border color
   final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: padding ?? const EdgeInsets.all(16),
       decoration: borderBottom
@@ -225,7 +226,7 @@ class AppCardContent extends StatelessWidget {
 
   /// Content child
   final Widget child;
-  
+
   /// Content padding
   final EdgeInsetsGeometry? padding;
 
@@ -252,16 +253,16 @@ class AppCardFooter extends StatelessWidget {
 
   /// Footer child
   final Widget child;
-  
+
   /// Footer padding
   final EdgeInsetsGeometry? padding;
-  
+
   /// Whether to show a border at the top
   final bool borderTop;
-  
+
   /// Border color
   final Color? borderColor;
-  
+
   /// Footer alignment
   final MainAxisAlignment alignment;
 

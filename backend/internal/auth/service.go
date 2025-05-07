@@ -34,36 +34,36 @@ type Config struct {
 type Service interface {
 	// Register registers a new user
 	Register(ctx context.Context, reg models.UserRegistration) (*models.UserResponse, error)
-	
+
 	// Login authenticates a user and returns a token pair
 	Login(ctx context.Context, login models.UserLogin) (*models.TokenPair, error)
-	
+
 	// RefreshToken refreshes an access token using a refresh token
 	RefreshToken(ctx context.Context, req models.RefreshTokenRequest) (*models.TokenPair, error)
-	
+
 	// ValidateToken validates a token and returns the claims
 	ValidateToken(ctx context.Context, tokenString string, tokenType models.TokenType) (*models.TokenClaims, error)
-	
+
 	// Logout invalidates a token
 	Logout(ctx context.Context, tokenString string) error
-	
+
 	// GetUserByID retrieves a user by ID
 	GetUserByID(ctx context.Context, id uuid.UUID) (*models.UserResponse, error)
 }
 
 // serviceImpl implements the Service interface
 type serviceImpl struct {
-	userRepo           repository.UserRepository
-	redisClient        *redis.Client
-	config             Config
+	userRepo    repository.UserRepository
+	redisClient *redis.Client
+	config      Config
 }
 
 // NewService creates a new auth service
 func NewService(userRepo repository.UserRepository, redisClient *redis.Client, config Config) Service {
 	return &serviceImpl{
-		userRepo:           userRepo,
-		redisClient:        redisClient,
-		config:             config,
+		userRepo:    userRepo,
+		redisClient: redisClient,
+		config:      config,
 	}
 }
 
@@ -224,12 +224,49 @@ func (s *serviceImpl) ValidateToken(ctx context.Context, tokenString string, tok
 	}
 	expiresAt := time.Unix(int64(expFloat), 0)
 
+	// Extract roles (if present)
+	var roles []string
+	if rolesInterface, ok := claims["roles"]; ok {
+		if rolesArray, ok := rolesInterface.([]interface{}); ok {
+			roles = make([]string, 0, len(rolesArray))
+			for _, role := range rolesArray {
+				if roleStr, ok := role.(string); ok {
+					roles = append(roles, roleStr)
+				}
+			}
+		}
+	}
+
+	// Extract permissions (if present)
+	var permissions []string
+	if permissionsInterface, ok := claims["permissions"]; ok {
+		if permissionsArray, ok := permissionsInterface.([]interface{}); ok {
+			permissions = make([]string, 0, len(permissionsArray))
+			for _, permission := range permissionsArray {
+				if permissionStr, ok := permission.(string); ok {
+					permissions = append(permissions, permissionStr)
+				}
+			}
+		}
+	}
+
+	// Extract organization ID (if present)
+	var orgID uuid.UUID
+	if orgIDStr, ok := claims["org_id"].(string); ok {
+		if parsedOrgID, err := uuid.Parse(orgIDStr); err == nil {
+			orgID = parsedOrgID
+		}
+	}
+
 	return &models.TokenClaims{
-		UserID:    userID,
-		Email:     email,
-		TokenType: tokenType,
-		IssuedAt:  issuedAt,
-		ExpiresAt: expiresAt,
+		UserID:      userID,
+		Email:       email,
+		TokenType:   tokenType,
+		Roles:       roles,
+		Permissions: permissions,
+		OrgID:       orgID,
+		IssuedAt:    issuedAt,
+		ExpiresAt:   expiresAt,
 	}, nil
 }
 
@@ -262,14 +299,50 @@ func (s *serviceImpl) generateTokenPair(user *models.User) (*models.TokenPair, e
 	accessTokenExpiry := now.Add(s.config.AccessTokenExpiry)
 	refreshTokenExpiry := now.Add(s.config.RefreshTokenExpiry)
 
-	// Create access token
+	// Get user roles for the default organization
+	// In a real application, this would be determined based on the request
+	defaultOrgID := uuid.MustParse("00000000-0000-0000-0000-000000000001")
+
+	// Create a roleRepository to get user roles
+	// This is not ideal as it creates a circular dependency, but it's a simple solution for now
+	// In a real application, you would inject the roleRepository into the auth service
+	db := s.userRepo.GetDB()
+	roleRepo := repository.NewPostgresRoleRepository(db)
+
+	// Get user roles
+	roles, err := roleRepo.GetUserRoles(context.Background(), user.ID, defaultOrgID)
+	if err != nil {
+		// If there's an error getting roles, we'll just continue without them
+		// This is not ideal, but it's better than failing the token generation
+		roles = []models.Role{}
+	}
+
+	// Extract role names and permissions
+	roleNames := make([]string, 0, len(roles))
+	permissions := make([]string, 0)
+	permissionMap := make(map[string]bool)
+
+	for _, role := range roles {
+		roleNames = append(roleNames, role.Name)
+		for _, permission := range role.Permissions {
+			if !permissionMap[permission.Name] {
+				permissions = append(permissions, permission.Name)
+				permissionMap[permission.Name] = true
+			}
+		}
+	}
+
+	// Create access token with roles and permissions
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":    user.ID.String(),
-		"email":      user.Email,
-		"token_type": string(models.AccessToken),
-		"iat":        now.Unix(),
-		"exp":        accessTokenExpiry.Unix(),
-		"iss":        s.config.Issuer,
+		"user_id":     user.ID.String(),
+		"email":       user.Email,
+		"token_type":  string(models.AccessToken),
+		"roles":       roleNames,
+		"permissions": permissions,
+		"org_id":      defaultOrgID.String(),
+		"iat":         now.Unix(),
+		"exp":         accessTokenExpiry.Unix(),
+		"iss":         s.config.Issuer,
 	})
 
 	// Sign access token

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Jerinji2016/halooid/backend/internal/auth"
 	"github.com/Jerinji2016/halooid/backend/internal/rbac"
+	"github.com/google/uuid"
 )
 
 // RBACMiddleware provides RBAC middleware
@@ -23,20 +24,32 @@ func NewRBACMiddleware(rbacService rbac.Service) *RBACMiddleware {
 func (m *RBACMiddleware) RequirePermission(permission string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get user ID from context
-			userID, err := auth.GetUserIDFromContext(r.Context())
+			// Get token claims from context
+			claims, err := auth.GetTokenClaimsFromContext(r.Context())
 			if err != nil {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
 
-			// Get organization ID from request
-			// In a real application, this would be determined based on the request
-			// For now, we'll use a default organization ID
-			orgID := DefaultOrganizationID
+			// First check if the permission is in the token claims
+			// This is more efficient than making a database call
+			for _, p := range claims.Permissions {
+				if p == permission {
+					// User has the permission in their token
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
 
-			// Check if user has permission
-			hasPermission, err := m.rbacService.HasPermission(r.Context(), userID, orgID, permission)
+			// Get organization ID from token or use default
+			orgID := claims.OrgID
+			if orgID == uuid.Nil {
+				orgID = DefaultOrganizationID
+			}
+
+			// If not found in token, check the database as a fallback
+			// This handles cases where permissions might have been updated since the token was issued
+			hasPermission, err := m.rbacService.HasPermission(r.Context(), claims.UserID, orgID, permission)
 			if err != nil {
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 				return
@@ -57,21 +70,35 @@ func (m *RBACMiddleware) RequirePermission(permission string) func(http.Handler)
 func (m *RBACMiddleware) RequireAnyPermission(permissions ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get user ID from context
-			userID, err := auth.GetUserIDFromContext(r.Context())
+			// Get token claims from context
+			claims, err := auth.GetTokenClaimsFromContext(r.Context())
 			if err != nil {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
 
-			// Get organization ID from request
-			// In a real application, this would be determined based on the request
-			// For now, we'll use a default organization ID
-			orgID := DefaultOrganizationID
+			// First check if any of the permissions are in the token claims
+			// This is more efficient than making a database call
+			for _, requiredPermission := range permissions {
+				for _, userPermission := range claims.Permissions {
+					if userPermission == requiredPermission {
+						// User has at least one of the required permissions in their token
+						next.ServeHTTP(w, r)
+						return
+					}
+				}
+			}
 
-			// Check if user has any of the permissions
+			// Get organization ID from token or use default
+			orgID := claims.OrgID
+			if orgID == uuid.Nil {
+				orgID = DefaultOrganizationID
+			}
+
+			// If not found in token, check the database as a fallback
+			// This handles cases where permissions might have been updated since the token was issued
 			for _, permission := range permissions {
-				hasPermission, err := m.rbacService.HasPermission(r.Context(), userID, orgID, permission)
+				hasPermission, err := m.rbacService.HasPermission(r.Context(), claims.UserID, orgID, permission)
 				if err != nil {
 					continue
 				}
@@ -93,21 +120,48 @@ func (m *RBACMiddleware) RequireAnyPermission(permissions ...string) func(http.H
 func (m *RBACMiddleware) RequireAllPermissions(permissions ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get user ID from context
-			userID, err := auth.GetUserIDFromContext(r.Context())
+			// Get token claims from context
+			claims, err := auth.GetTokenClaimsFromContext(r.Context())
 			if err != nil {
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
 
-			// Get organization ID from request
-			// In a real application, this would be determined based on the request
-			// For now, we'll use a default organization ID
-			orgID := DefaultOrganizationID
+			// First check if all of the permissions are in the token claims
+			// This is more efficient than making a database call
+			allPermissionsInToken := true
+			permissionsToCheck := make([]string, 0)
 
-			// Check if user has all of the permissions
-			for _, permission := range permissions {
-				hasPermission, err := m.rbacService.HasPermission(r.Context(), userID, orgID, permission)
+			for _, requiredPermission := range permissions {
+				found := false
+				for _, userPermission := range claims.Permissions {
+					if userPermission == requiredPermission {
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					allPermissionsInToken = false
+					permissionsToCheck = append(permissionsToCheck, requiredPermission)
+				}
+			}
+
+			// If all permissions are in the token, we can proceed
+			if allPermissionsInToken {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			// Get organization ID from token or use default
+			orgID := claims.OrgID
+			if orgID == uuid.Nil {
+				orgID = DefaultOrganizationID
+			}
+
+			// Check the database for the permissions not found in the token
+			for _, permission := range permissionsToCheck {
+				hasPermission, err := m.rbacService.HasPermission(r.Context(), claims.UserID, orgID, permission)
 				if err != nil || !hasPermission {
 					// User doesn't have one of the required permissions
 					http.Error(w, "Permission denied", http.StatusForbidden)

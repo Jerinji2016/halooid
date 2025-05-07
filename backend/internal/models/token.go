@@ -25,11 +25,14 @@ type TokenPair struct {
 
 // TokenClaims represents the claims in a JWT token
 type TokenClaims struct {
-	UserID    uuid.UUID `json:"user_id"`
-	Email     string    `json:"email"`
-	TokenType TokenType `json:"token_type"`
-	IssuedAt  time.Time `json:"issued_at"`
-	ExpiresAt time.Time `json:"expires_at"`
+	UserID      uuid.UUID `json:"user_id"`
+	Email       string    `json:"email"`
+	TokenType   TokenType `json:"token_type"`
+	Roles       []string  `json:"roles,omitempty"`
+	Permissions []string  `json:"permissions,omitempty"`
+	OrgID       uuid.UUID `json:"org_id,omitempty"`
+	IssuedAt    time.Time `json:"issued_at"`
+	ExpiresAt   time.Time `json:"expires_at"`
 }
 
 // RefreshTokenRequest represents the request to refresh an access token

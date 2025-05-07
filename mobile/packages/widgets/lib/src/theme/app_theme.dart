@@ -26,24 +26,27 @@ class AppTheme {
         onError: AppColors.errorContrastText,
         errorContainer: AppColors.errorLight,
         onErrorContainer: AppColors.errorDark,
-        background: AppColors.backgroundDefault,
-        onBackground: AppColors.textPrimary,
-        surface: AppColors.backgroundPaper,
+        // Using surface instead of deprecated background
+        surface: AppColors.backgroundDefault,
         onSurface: AppColors.textPrimary,
-        surfaceVariant: AppColors.neutralLight,
+        // Additional surface container
+        surfaceContainer: AppColors.backgroundPaper,
+        // Using surfaceContainerHighest instead of deprecated surfaceVariant
+        surfaceContainerHighest: AppColors.neutralLight,
         onSurfaceVariant: AppColors.neutralDark,
         outline: AppColors.neutralMain,
-        shadow: Colors.black.withOpacity(0.1),
+        // Using a constant color value to avoid method invocation in const context
+        shadow: const Color(0x1A000000), // Colors.black with 10% opacity
         inverseSurface: AppColors.backgroundDark,
         onInverseSurface: Colors.white,
         inversePrimary: AppColors.primaryLight,
         surfaceTint: AppColors.primaryMain,
       ),
-      
+
       // Typography
       fontFamily: 'Inter',
       textTheme: TextStyles.textTheme,
-      
+
       // AppBar theme
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.backgroundPaper,
@@ -57,7 +60,7 @@ class AppTheme {
           color: AppColors.textPrimary,
         ),
       ),
-      
+
       // Card theme
       cardTheme: CardTheme(
         color: AppColors.backgroundPaper,
@@ -67,7 +70,7 @@ class AppTheme {
         ),
         margin: const EdgeInsets.all(8),
       ),
-      
+
       // Button themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -85,7 +88,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryMain,
@@ -101,7 +104,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryMain,
@@ -116,12 +119,13 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.backgroundPaper,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: AppColors.neutralMain),
@@ -161,21 +165,21 @@ class AppTheme {
           color: AppColors.errorMain,
         ),
       ),
-      
+
       // Divider theme
       dividerTheme: const DividerThemeData(
         color: AppColors.neutralLight,
         thickness: 1,
         space: 1,
       ),
-      
+
       // Checkbox theme
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return AppColors.textDisabled;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryMain;
           }
           return AppColors.neutralMain;
@@ -184,42 +188,42 @@ class AppTheme {
           borderRadius: BorderRadius.circular(4),
         ),
       ),
-      
+
       // Switch theme
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return AppColors.textDisabled;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryMain;
           }
           return AppColors.neutralMain;
         }),
-        trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
-            return AppColors.textDisabled.withOpacity(0.5);
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.textDisabled.withAlpha(128); // 50% opacity
           }
-          if (states.contains(MaterialState.selected)) {
-            return AppColors.primaryMain.withOpacity(0.5);
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primaryMain.withAlpha(128); // 50% opacity
           }
-          return AppColors.neutralMain.withOpacity(0.5);
+          return AppColors.neutralMain.withAlpha(128); // 50% opacity
         }),
       ),
-      
+
       // Radio theme
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return AppColors.textDisabled;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryMain;
           }
           return AppColors.neutralMain;
         }),
       ),
-      
+
       // Slider theme
       sliderTheme: const SliderThemeData(
         activeTrackColor: AppColors.primaryMain,
@@ -234,18 +238,18 @@ class AppTheme {
           color: AppColors.primaryContrastText,
         ),
       ),
-      
+
       // Progress indicator theme
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primaryMain,
         linearTrackColor: AppColors.neutralLight,
         circularTrackColor: AppColors.neutralLight,
       ),
-      
+
       // Tooltip theme
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AppColors.neutralDark.withOpacity(0.9),
+          color: AppColors.neutralDark.withAlpha(230), // 90% opacity
           borderRadius: BorderRadius.circular(4),
         ),
         textStyle: const TextStyle(
@@ -255,7 +259,7 @@ class AppTheme {
           color: Colors.white,
         ),
       ),
-      
+
       // Snackbar theme
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.neutralDark,
@@ -295,11 +299,13 @@ class AppTheme {
         onError: AppColors.errorDark,
         errorContainer: AppColors.errorDark,
         onErrorContainer: AppColors.errorLight,
-        background: AppColors.backgroundDark,
-        onBackground: Colors.white,
-        surface: Color(0xFF1E1E1E),
+        // Using surface instead of deprecated background
+        surface: AppColors.backgroundDark,
         onSurface: Colors.white,
-        surfaceVariant: Color(0xFF2C2C2C),
+        // Additional surface container
+        surfaceContainer: const Color(0xFF1E1E1E),
+        // Using surfaceContainerHighest instead of deprecated surfaceVariant
+        surfaceContainerHighest: const Color(0xFF2C2C2C),
         onSurfaceVariant: AppColors.neutralLight,
         outline: AppColors.neutralLight,
         shadow: Colors.black,
@@ -308,11 +314,11 @@ class AppTheme {
         inversePrimary: AppColors.primaryMain,
         surfaceTint: AppColors.primaryLight,
       ),
-      
+
       // Typography
       fontFamily: 'Inter',
       textTheme: TextStyles.darkTextTheme,
-      
+
       // AppBar theme
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF1E1E1E),
@@ -326,7 +332,7 @@ class AppTheme {
           color: Colors.white,
         ),
       ),
-      
+
       // Card theme
       cardTheme: CardTheme(
         color: const Color(0xFF1E1E1E),
@@ -336,7 +342,7 @@ class AppTheme {
         ),
         margin: const EdgeInsets.all(8),
       ),
-      
+
       // Button themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -354,7 +360,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryLight,
@@ -370,7 +376,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryLight,
@@ -385,12 +391,13 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: AppColors.neutralLight),
@@ -430,21 +437,21 @@ class AppTheme {
           color: AppColors.errorLight,
         ),
       ),
-      
+
       // Divider theme
       dividerTheme: const DividerThemeData(
         color: Color(0xFF2C2C2C),
         thickness: 1,
         space: 1,
       ),
-      
+
       // Checkbox theme
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.white30;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryLight;
           }
           return Colors.white54;
@@ -453,42 +460,42 @@ class AppTheme {
           borderRadius: BorderRadius.circular(4),
         ),
       ),
-      
+
       // Switch theme
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.white30;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryLight;
           }
           return Colors.white54;
         }),
-        trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.white10;
           }
-          if (states.contains(MaterialState.selected)) {
-            return AppColors.primaryLight.withOpacity(0.5);
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primaryLight.withAlpha(128); // 50% opacity
           }
           return Colors.white24;
         }),
       ),
-      
+
       // Radio theme
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.white30;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryLight;
           }
           return Colors.white54;
         }),
       ),
-      
+
       // Slider theme
       sliderTheme: const SliderThemeData(
         activeTrackColor: AppColors.primaryLight,
@@ -503,18 +510,18 @@ class AppTheme {
           color: AppColors.primaryDark,
         ),
       ),
-      
+
       // Progress indicator theme
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primaryLight,
         linearTrackColor: Colors.white24,
         circularTrackColor: Colors.white24,
       ),
-      
+
       // Tooltip theme
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withAlpha(230), // 90% opacity
           borderRadius: BorderRadius.circular(4),
         ),
         textStyle: const TextStyle(
@@ -524,7 +531,7 @@ class AppTheme {
           color: Colors.black,
         ),
       ),
-      
+
       // Snackbar theme
       snackBarTheme: SnackBarThemeData(
         backgroundColor: Colors.white,
