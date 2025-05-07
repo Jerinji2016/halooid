@@ -25,6 +25,10 @@
          <lastmod>2025-05-07</lastmod>
     </url>
     <url>
+         <loc>https://yourusername.github.io/halooid/api-reference/notification/</loc>
+         <lastmod>2025-05-07</lastmod>
+    </url>
+    <url>
          <loc>https://yourusername.github.io/halooid/api-reference/rest/</loc>
          <lastmod>2025-05-07</lastmod>
     </url>
@@ -33,11 +37,27 @@
          <lastmod>2025-05-07</lastmod>
     </url>
     <url>
+         <loc>https://yourusername.github.io/halooid/api-reference/taskodex/comment/</loc>
+         <lastmod>2025-05-07</lastmod>
+    </url>
+    <url>
+         <loc>https://yourusername.github.io/halooid/api-reference/taskodex/file-attachment/</loc>
+         <lastmod>2025-05-07</lastmod>
+    </url>
+    <url>
          <loc>https://yourusername.github.io/halooid/api-reference/taskodex/project/</loc>
          <lastmod>2025-05-07</lastmod>
     </url>
     <url>
+         <loc>https://yourusername.github.io/halooid/api-reference/taskodex/task-assignment/</loc>
+         <lastmod>2025-05-07</lastmod>
+    </url>
+    <url>
          <loc>https://yourusername.github.io/halooid/api-reference/taskodex/task/</loc>
+         <lastmod>2025-05-07</lastmod>
+    </url>
+    <url>
+         <loc>https://yourusername.github.io/halooid/api-reference/taskodex/time-entry/</loc>
          <lastmod>2025-05-07</lastmod>
     </url>
     <url>
