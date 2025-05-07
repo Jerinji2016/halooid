@@ -6,11 +6,9 @@ import { API_BASE_URL } from '$lib/config';
  */
 export class TaskApi {
   private baseUrl: string;
-  private orgId: string;
 
   constructor(orgId: string) {
     this.baseUrl = `${API_BASE_URL}/organizations/${orgId}/taskodex`;
-    this.orgId = orgId;
   }
 
   /**
@@ -40,7 +38,7 @@ export class TaskApi {
    */
   async listTasks(params: TaskListParams = {}): Promise<{ tasks: TaskResponse[], pagination: { total: number, page: number, page_size: number, total_pages: number } }> {
     const queryParams = new URLSearchParams();
-    
+
     if (params.status) queryParams.append('status', params.status);
     if (params.priority) queryParams.append('priority', params.priority);
     if (params.assignedTo) queryParams.append('assigned_to', params.assignedTo);
